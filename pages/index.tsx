@@ -2,33 +2,17 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import 'leaflet/dist/leaflet.css'
 import { supabase } from '../lib/supabaseClient'
+import 'leaflet/dist/leaflet.css'
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false })
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false })
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false })
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false })
 
-import L from 'leaflet'
-
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
-})
-
-type Board = {
-  id: string
-  name: string
-  address: string
-  lat: number
-  lng: number
-}
-
-export default function HomePage() {
-  const [boards, setBoards] = useState<Board[]>([])
+const LeafletMap = () => {
+  const [boards, setBoards] = useState<any[]>([])
+  const [L, setL] = useState<any>(null)
 
   useEffect(() => {
     const fetchBoards = async () => {
@@ -39,8 +23,23 @@ export default function HomePage() {
         setBoards(data)
       }
     }
+
+    const loadLeaflet = async () => {
+      const leaflet = await import('leaflet')
+      delete (leaflet.Icon.Default.prototype as any)._getIconUrl
+      leaflet.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
+      })
+      setL(leaflet)
+    }
+
     fetchBoards()
+    loadLeaflet()
   }, [])
+
+  if (!L) return <p>Loading map...</p>
 
   return (
     <div style={{ height: '100vh', width: '100%' }}>
@@ -61,3 +60,5 @@ export default function HomePage() {
     </div>
   )
 }
+
+export default LeafletMap
