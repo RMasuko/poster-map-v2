@@ -18,8 +18,9 @@ const LeafletMap = () => {
     const fetchBoards = async () => {
       const { data, error } = await supabase.from('boards').select('*')
       if (error) {
-        console.error('Error fetching boards:', error)
+        console.error('❌ Supabaseエラー:', error)
       } else {
+        console.log('✅ Supabaseから取得したデータ:', data)
         setBoards(data)
       }
     }
