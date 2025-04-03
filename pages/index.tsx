@@ -5,13 +5,22 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import 'leaflet/dist/leaflet.css'
 
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false })
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false })
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false })
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false })
+// Map関連を動的インポート（SSRオフ）
+const MapContainer = dynamic(() => import('react-leaflet').then(m => m.MapContainer), { ssr: false })
+const TileLayer = dynamic(() => import('react-leaflet').then(m => m.TileLayer), { ssr: false })
+const Marker = dynamic(() => import('react-leaflet').then(m => m.Marker), { ssr: false })
+const Popup = dynamic(() => import('react-leaflet').then(m => m.Popup), { ssr: false })
 
-const LeafletMap = () => {
-  const [boards, setBoards] = useState<any[]>([])
+type Board = {
+  id: string
+  name: string
+  address: string
+  lat: number
+  lng: number
+}
+
+export default function HomePage() {
+  const [boards, setBoards] = useState<Board[]>([])
   const [L, setL] = useState<any>(null)
 
   useEffect(() => {
@@ -47,7 +56,7 @@ const LeafletMap = () => {
       <MapContainer center={[35.8465, 139.6200]} zoom={13} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
         {boards.map((board) => (
           <Marker key={board.id} position={[board.lat, board.lng]}>
@@ -61,5 +70,3 @@ const LeafletMap = () => {
     </div>
   )
 }
-
-export default LeafletMap
