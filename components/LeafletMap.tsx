@@ -1,14 +1,17 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { supabase } from '../lib/supabaseClient'
 
+// Leafletのアイコン設定
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 })
 
 type Board = {
@@ -32,11 +35,14 @@ export default function LeafletMap() {
         setBoards(data)
       }
     }
+
     fetchBoards()
   }, [])
 
+  if (!boards || boards.length === 0) return <p>ポスター情報を読み込んでいます...</p>
+
   return (
-    <MapContainer center={[35.8465, 139.6200]} zoom={13} style={{ height: '100%', width: '100%' }}>
+    <MapContainer center={[35.8465, 139.6200]} zoom={13} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
         attribution='&copy; OpenStreetMap contributors'
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
